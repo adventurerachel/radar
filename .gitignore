@@ -10,4 +10,4 @@ __pycache__/
 *.log
 
 # Local-only cache
-storage/snapshots.json
+storage/history
