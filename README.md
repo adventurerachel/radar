@@ -4,21 +4,20 @@ A Python monitoring framework for tracking changes to websites and sending alert
 
 ## Current monitors
 
-- Head for Points Barclaycard Avios Plus
+- Head for Points Barclaycard Avios Plus Mastercard
 - Head for Points HSBC Premier Credit Card
+
+## Features
+
+- Discovers latest articles from category pages
+- Extracts structured data
+- Tracks historical changes
+- Sends Pushover notifications
 
 ## Stack
 
 - Python
 - uv
 - BeautifulSoup
+- GitHub
 - Pushover
-
-## Features
-
-- Finds latest articles from category pages
-- Extracts structured fields
-- Stores historical records
-- Detects changes
-- Sends notifications
-
