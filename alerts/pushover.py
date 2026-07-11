@@ -22,6 +22,6 @@ def send_alert(title, message):
         timeout=30
     )
 
-    print(response.text)
+    print(f"Pushover response: {response.status_code} {response.text}")
 
     response.raise_for_status()

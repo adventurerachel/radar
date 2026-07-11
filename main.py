@@ -33,15 +33,22 @@ def main():
 
         if changed:
 
+            print("CHANGE DETECTED")
+
             message = format_alert_message(
                 monitor["name"],
                 result
             )
 
+            print(message)
+
             send_alert(
                 monitor["name"],
                 message
             )
+
+        else:
+            print("No change detected")
 
         print(result)
 
