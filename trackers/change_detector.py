@@ -47,3 +47,5 @@ def has_changed(name, current):
     save_snapshots(snapshots)
 
     return True
+
+    

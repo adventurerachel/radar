@@ -52,6 +52,11 @@ def main():
 
         print(result)
 
+# TEMPORARY TEST ONLY
+send_alert(
+    "Radar Test",
+    "GitHub Actions can send Pushover alerts"
+)
 
 if __name__ == "__main__":
     main()
