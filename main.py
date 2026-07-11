@@ -7,38 +7,44 @@ from monitors.page_monitor import monitor_article
 from alerts.formatter import format_alert_message
 
 
-for monitor in MONITORS:
+def main():
 
-    article_url = discover_url_by_link_text(
-        monitor["category_url"],
-        monitor["search_text"]
-    )
+    for monitor in MONITORS:
 
-    result = monitor_article(
-        article_url,
-        monitor["extractors"]
-    )
+        article_url = discover_url_by_link_text(
+            monitor["category_url"],
+            monitor["search_text"]
+        )
 
-    changed = has_changed(
-        monitor["history_file"],
-        result
-    )
+        result = monitor_article(
+            article_url,
+            monitor["extractors"]
+        )
 
-    append_history(
-        monitor["history_file"],
-        result
-    )
-
-    if changed:
-
-        message = format_alert_message(
-            monitor["name"],
+        changed = has_changed(
+            monitor["history_file"],
             result
         )
 
-        send_alert(
-            monitor["name"],
-            message
+        append_history(
+            monitor["history_file"],
+            result
         )
 
-    print(result)
+        if changed:
+
+            message = format_alert_message(
+                monitor["name"],
+                result
+            )
+
+            send_alert(
+                monitor["name"],
+                message
+            )
+
+        print(result)
+
+
+if __name__ == "__main__":
+    main()

@@ -3,7 +3,11 @@ __pycache__/
 *.pyc
 .venv/
 
-storage/snapshots.json
-storage/history/
-
+# Python package metadata
 *.egg-info/
+
+# Temporary files
+*.log
+
+# Local-only cache
+storage/snapshots.json
