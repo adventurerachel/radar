@@ -1,45 +1,79 @@
+# .github/workflows/radar.yml
+#
+# Radar execution workflow.
+#
+# Purpose:
+# - Runs the radar monitoring process on a weekly schedule.
+# - Allows manual execution from the GitHub Actions UI.
+# - Persists updated snapshots back to the repository so future runs
+#   can detect changes relative to previous results.
+#
+# Required repository secrets:
+# - PUSHOVER_API_TOKEN
+# - PUSHOVER_USER_KEY
+
 name: Run radar
 
 on:
+  # Run every Sunday at 03:00 UTC.
   schedule:
     - cron: "0 3 * * 0"
 
+  # Allow manual execution from the Actions tab.
   workflow_dispatch:
 
+# Required so the workflow can commit updated snapshots.
 permissions:
   contents: write
 
 jobs:
   radar:
+    # Execute on GitHub's hosted Ubuntu runner.
     runs-on: ubuntu-latest
 
     steps:
+      # Check out repository contents.
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Install uv package manager.
       - name: Setup uv
         uses: astral-sh/setup-uv@v6
 
+      # Install the project's Python version.
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
 
+      # Create/update the virtual environment and install dependencies.
       - name: Install dependencies
         run: uv sync
 
+      # Execute the radar pipeline.
+      #
+      # The application:
+      # 1. Fetches monitored sources.
+      # 2. Compares results against stored snapshots.
+      # 3. Sends notifications for detected changes.
+      # 4. Updates snapshots for future comparisons.
       - name: Run radar
         env:
           PUSHOVER_API_TOKEN: ${{ secrets.PUSHOVER_API_TOKEN }}
           PUSHOVER_USER_KEY: ${{ secrets.PUSHOVER_USER_KEY }}
         run: uv run python main.py
 
-      - name: Commit updated snapshots
+      # Persist updated snapshot data.
+      #
+      # A commit is only created when snapshots.json changes,
+      # preventing unnecessary commits on runs where no updates
+      # are detected.
+      - name: Commit updated snapshots and history
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add storage/snapshots.json
+          git add storage/snapshots.json storage/history/*.jsonl
 
           git diff --staged --quiet || git commit -m "Update radar snapshots"
 

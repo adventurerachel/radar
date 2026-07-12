@@ -1,9 +1,33 @@
+"""
+Tests for Barclaycard bonus extraction.
+
+These tests verify that the Barclaycard extractor correctly identifies
+sign-up bonus information from article HTML.
+
+The tests use small HTML snippets rather than live webpages so that
+they remain:
+    - Fast to run
+    - Reliable
+    - Independent of external websites
+
+Covered behaviours:
+    - Extracting Avios bonus amounts
+    - Extracting spend requirements
+    - Handling missing bonus sections
+    - Finding information across multiple HTML elements
+    - Handling headings containing additional text
+"""
+
 from bs4 import BeautifulSoup
 
 from extractors.barclaycard import extract_barclaycard_bonus
 
 
 def test_extracts_barclaycard_bonus_details():
+    """
+    Extract Avios bonus and spend requirement from a standard article
+    section.
+    """
 
     html = """
     <h2>
@@ -30,6 +54,9 @@ def test_extracts_barclaycard_bonus_details():
 
 
 def test_returns_none_when_bonus_not_found():
+    """
+    Return empty values when the expected bonus section does not exist.
+    """
 
     html = """
     <h2>
@@ -50,7 +77,12 @@ def test_returns_none_when_bonus_not_found():
         "spend_requirement_gbp": None,
     }
 
+
 def test_extracts_bonus_across_multiple_elements():
+    """
+    Extract relevant values even when bonus information is spread
+    across different HTML elements.
+    """
 
     html = """
     <h2>
@@ -77,7 +109,11 @@ def test_extracts_bonus_across_multiple_elements():
     assert result["bonus_avios"] == 50000
     assert result["spend_requirement_gbp"] == 3000
 
+
 def test_handles_heading_with_extra_text():
+    """
+    Extract values when the target heading contains additional text.
+    """
 
     html = """
     <h2>

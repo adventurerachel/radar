@@ -1,3 +1,18 @@
+# .github/workflows/ci.yml
+#
+# Continuous Integration workflow.
+# Validates that the application installs correctly and that all
+# automated tests pass on every pull request and push to main.
+
+# Continuous Integration (CI) workflow.
+#
+# Runs automated tests whenever:
+# - Code is pushed to the main branch
+# - A pull request is opened or updated
+#
+# Purpose:
+# Ensure all tests pass before changes are merged or deployed.
+
 name: CI
 
 on:
@@ -8,17 +23,24 @@ on:
 
 jobs:
   test:
+    # Execute tests on GitHub's latest Ubuntu runner.
     runs-on: ubuntu-latest
 
     steps:
+      # Check out repository contents.
       - uses: actions/checkout@v4
 
+      # Install uv, the project's package and environment manager.
       - uses: astral-sh/setup-uv@v6
 
+      # Install the Python version used by the project.
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
 
+      # Create/update the virtual environment and install dependencies
+      # defined in pyproject.toml and uv.lock.
       - run: uv sync
 
+      # Run the project's automated test suite.
       - run: uv run pytest

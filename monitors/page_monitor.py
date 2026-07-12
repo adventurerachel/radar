@@ -1,3 +1,26 @@
+"""
+Monitor webpages and extract configured article data.
+
+This module handles the common workflow for monitored articles:
+
+    URL
+     |
+     v
+ Fetch HTML
+     |
+     v
+ Parse with BeautifulSoup
+     |
+     v
+ Run configured extractors
+     |
+     v
+ Return structured results
+
+Individual extraction logic is kept separate in the extractors
+package. This module only coordinates fetching and extraction.
+"""
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -15,7 +38,47 @@ EXTRACTOR_MAP = {
 }
 
 
-def monitor_article(url, extractor_names):
+def monitor_article(
+    url: str,
+    extractor_names: list[str],
+) -> dict:
+    """
+    Fetch an article and extract configured information.
+
+    Args:
+        url:
+            Article URL to monitor.
+
+        extractor_names:
+            List of extractor names to run. Names must exist in
+            EXTRACTOR_MAP.
+
+    Returns:
+        Dictionary containing:
+            - source_url:
+                URL of the monitored article.
+            - Extracted fields returned by the selected extractors.
+
+    Raises:
+        requests.HTTPError:
+            If the article cannot be retrieved.
+
+        KeyError:
+            If an unknown extractor name is supplied.
+
+    Example:
+        monitor_article(
+            "https://example.com/article",
+            ["update_date", "special_offer"]
+        )
+
+        Returns:
+            {
+                "source_url": "https://example.com/article",
+                "update_date": "12 July 2026",
+                "special_offer": "Earn 25,000 Avios"
+            }
+    """
 
     response = requests.get(
         url,
@@ -36,7 +99,12 @@ def monitor_article(url, extractor_names):
 
     for extractor_name in extractor_names:
 
-        extractor = EXTRACTOR_MAP[extractor_name]
+        extractor = EXTRACTOR_MAP.get(extractor_name)
+
+        if not extractor:
+            raise ValueError(
+                f"Unknown extractor: {extractor_name}"
+            )
 
         result[extractor_name] = extractor(soup)
 
