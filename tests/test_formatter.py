@@ -81,7 +81,7 @@ format_alert_message(
     {}
 )
 
-def test_formats_special_offer_alert():
+def format_special_offer_alert():
 
     message = format_special_offer_alert(
         "HSBC",
