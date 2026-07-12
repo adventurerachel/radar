@@ -21,6 +21,8 @@ on:
       - main
   pull_request:
 
+  workflow_dispatch:
+
 jobs:
   test:
     # Execute tests on GitHub's latest Ubuntu runner.
