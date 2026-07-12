@@ -34,7 +34,7 @@ jobs:
     steps:
       # Check out repository contents.
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Install uv package manager.
       - name: Setup uv
@@ -42,7 +42,7 @@ jobs:
 
       # Install the project's Python version.
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 

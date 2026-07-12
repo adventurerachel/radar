@@ -30,13 +30,13 @@ jobs:
 
     steps:
       # Check out repository contents.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       # Install uv, the project's package and environment manager.
       - uses: astral-sh/setup-uv@v6
 
       # Install the Python version used by the project.
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
