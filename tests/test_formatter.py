@@ -81,9 +81,9 @@ format_alert_message(
     {}
 )
 
-def format_special_offer_alert():
+def test_formats_special_offer_alert():
 
-    message = format_special_offer_alert(
+    message = format_alert_message(
         "HSBC",
         {
             "special_offer": "SPECIAL OFFER: Earn 30,000 points",
