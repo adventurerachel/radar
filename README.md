@@ -1,135 +1,179 @@
-# Radar
+# Radar 📡
 
-Radar is a lightweight web monitoring tool that detects changes on selected web pages, extracts structured information, and sends notifications when meaningful updates occur.
+An automated web monitoring system that tracks pages for changes, extracts structured information, stores historical observations, and sends notifications when important updates are detected.
 
-It is designed to automate the repetitive task of checking websites for changes, while keeping the monitoring logic modular and easy to extend.
+Radar is designed as a lightweight, configurable monitoring pipeline that can be adapted to different websites and information sources.
 
 ## Features
 
-* 🔎 Discover relevant pages from configured sources
-* 🧩 Extract structured information from web content
-* 🔄 Detect changes against previous results
-* 🔔 Send notifications when updates are detected
-* ⏰ Run automatically on a schedule using GitHub Actions
-* 💾 Persist state between runs using version-controlled snapshots
+* 🔎 **Automatic page discovery**
 
-## How It Works
+  * Locates the current page or article to monitor using configurable discovery rules.
 
-Radar follows a simple pipeline:
+* 🧩 **Pluggable extractors**
 
-```
-Website
-   |
-   v
-Discover page
-   |
-   v
-Extract information
-   |
-   v
-Compare with previous snapshot
-   |
-   +---- No change
-   |
-   +---- Change detected
-             |
-             v
-       Send notification
-```
+  * Extracts structured data from HTML pages.
+  * Supports different extraction strategies depending on the monitored source.
 
-Each monitored source is configured with:
+* 📸 **Change detection**
 
-* How to find the relevant page
-* Which extractors should run
-* Where historical state should be stored
+  * Compares newly extracted information against previously stored snapshots.
+  * Identifies meaningful changes without requiring manual checking.
 
-## Project Structure
+* 📚 **Historical tracking**
 
-```
+  * Records every monitoring run as timestamped JSON Lines (`.jsonl`) data.
+  * Maintains a history of observations for future analysis.
+
+* 🔔 **Notifications**
+
+  * Sends alerts when monitored content changes.
+  * Supports recurring notifications for selected conditions, such as active promotions or announcements.
+
+* ⚙️ **Automated execution**
+
+  * Runs on a scheduled GitHub Actions workflow.
+  * Supports manual execution for testing and debugging.
+
+## Architecture
+
+The project separates responsibilities into independent modules:
+
+```text
 radar/
 │
-├── alerts/          # Notification formatting and delivery
-├── discoverers/     # Finding relevant pages
-├── extractors/      # Extracting structured data
-├── monitors/        # Monitoring logic
-├── trackers/        # Change detection and history management
-├── storage/         # Persisted snapshots and history
-├── tests/           # Automated tests
+├── alerts/
+│   ├── formatter.py       # Creates notification messages
+│   └── pushover.py        # Sends notifications
 │
-├── main.py
-├── config.py
-├── pyproject.toml
-└── README.md
+├── discoverers/
+│   └── link_text.py       # Discovers current pages to monitor
+│
+├── extractors/
+│   └── ...                # Source-specific HTML extraction logic
+│
+├── monitors/
+│   └── page_monitor.py    # Fetches pages and runs extractors
+│
+├── trackers/
+│   ├── change_detector.py # Detects changes against snapshots
+│   └── history.py         # Stores historical observations
+│
+├── storage/
+│   ├── snapshots.json     # Latest known state
+│   └── history/           # Historical monitoring data
+│
+├── tests/                 # Automated tests
+│
+├── config.py              # Monitor configuration
+└── main.py                # Workflow orchestration
 ```
 
-## Running Locally
+## How it works
 
-Install dependencies:
+For each configured monitor:
+
+1. Discover the current page URL.
+2. Retrieve and parse the page content.
+3. Run configured extractors.
+4. Store the latest observation in history.
+5. Compare against the previous snapshot.
+6. Send notifications when configured conditions are met.
+7. Update stored state.
+
+## Configuration
+
+Monitors are defined through configuration rather than hard-coded workflows.
+
+Each monitor specifies:
+
+* a name and identifier
+* how to locate the page
+* which extractors to run
+* how extracted information should be tracked
+
+This allows new monitoring targets to be added without changing the core workflow.
+
+## Running locally
+
+### Install dependencies
+
+Radar uses `uv` for dependency management.
 
 ```bash
 uv sync
 ```
 
-Create a `.env` file containing required environment variables:
-
-```
-PUSHOVER_API_TOKEN=your_token
-PUSHOVER_USER_KEY=your_user_key
-```
-
-Run Radar:
+### Run the monitor
 
 ```bash
 uv run python main.py
 ```
 
-## Testing
-
-Tests are written using `pytest`.
-
-Run the test suite:
+### Run tests
 
 ```bash
 uv run pytest
 ```
 
-The tests cover individual components such as:
+## GitHub Actions
 
-* Data extraction
-* Change detection
-* Notification formatting
+Two workflows are included.
 
-## Automation
+### CI
 
-Radar runs automatically through GitHub Actions.
+Runs automatically on:
+
+* pushes to `main`
+* pull requests
+* manual workflow runs
+
+The CI workflow installs dependencies and runs the test suite.
+
+### Radar
+
+Runs automatically on a scheduled basis and can also be triggered manually.
 
 The workflow:
 
-1. Starts on a scheduled basis
-2. Installs dependencies
-3. Runs the monitoring process
-4. Updates stored snapshots
-5. Commits changes back to the repository
+* installs dependencies
+* executes the monitoring pipeline
+* updates stored tracking data
+* commits updated state
 
-This allows Radar to operate continuously without requiring a local machine to be running.
+## Environment variables
 
-## Design Approach
+Notification credentials are loaded from environment variables:
 
-Radar separates responsibilities into small, independent components:
+```text
+PUSHOVER_USER_KEY
+PUSHOVER_API_TOKEN
+```
 
-* **Discoverers** find pages
-* **Extractors** convert HTML into structured data
-* **Trackers** determine whether information has changed
-* **Alerts** handle notification delivery
+Secrets should be stored securely using GitHub Actions secrets or a local environment file.
 
-This makes it possible to add new monitors without changing the core application logic.
+## Testing
 
-## Future Improvements
+The project includes automated tests covering:
 
-Potential future enhancements include:
+* HTML extraction logic
+* change detection behaviour
+* notification formatting
+* edge cases where expected information is missing
 
-* Adding more notification channels
-* Improving configuration management
-* Adding richer historical reporting
-* Expanding automated testing coverage
-* Supporting additional data sources
+The test suite helps prevent changes to extraction logic from silently breaking monitoring.
+
+## Future ideas
+
+Potential improvements:
+
+* Add dashboards for historical trends.
+* Support additional notification providers.
+* Add monitoring failure alerts.
+* Introduce configurable alert rules.
+* Store larger datasets in a database.
+* Expand support for different page structures.
+
+## Why "Radar"?
+
+Radar is designed to quietly monitor information in the background and surface changes that matter, rather than requiring repeated manual checks.
