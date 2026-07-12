@@ -8,7 +8,10 @@ These tests verify that:
     - update dates are included when available
 """
 
-from alerts.formatter import format_alert_message
+from alerts.formatter import (
+    format_alert_message,
+    format_special_offer_alert,
+)
 
 
 def test_formats_barclaycard_alert():
@@ -83,7 +86,7 @@ format_alert_message(
 
 def test_formats_special_offer_alert():
 
-    message = format_alert_message(
+    message = format_special_offer_alert(
         "HSBC",
         {
             "special_offer": "SPECIAL OFFER: Earn 30,000 points",
