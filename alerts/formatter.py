@@ -1,50 +1,48 @@
 """
-Format radar change notifications.
+Format radar notifications into human-readable messages.
 
-This module converts extracted article data into a human-readable
-message suitable for sending through notification services such as
-Pushover.
+This module contains functions for converting extracted monitor
+data into notification messages suitable for Pushover alerts.
+
+Alert types:
+
+    Change alerts:
+        Sent when monitored article data differs from the previous
+        stored snapshot.
+
+    Special offer alerts:
+        Sent whenever an active special offer is detected, even if
+        the offer was present during a previous radar run.
 """
 
 
 def format_alert_message(name: str, data: dict) -> str:
     """
-    Create a formatted alert message from detected changes.
+    Format a change detection alert.
 
-    The output includes only the fields available in the extracted
-    data, allowing different sources to provide different types of
-    information.
+    This message is used when monitored article data has changed
+    since the previous snapshot.
 
     Args:
         name:
-            Name of the monitored source or article.
+            Human-readable monitor name.
 
         data:
-            Dictionary containing extracted change details.
-
-            Supported fields:
-                - barclaycard_bonus
-                - hsbc_conclusion
-                - special_offer
-                - update_date
+            Extracted article data containing any changed fields.
 
     Returns:
-        A formatted multi-line alert message.
+        Formatted alert message containing relevant changed data.
 
     Example:
-        Input:
+        format_alert_message(
+            "Barclaycard Avios Plus",
             {
-                "special_offer": "Earn 25,000 Avios",
-                "update_date": "12 July 2026"
+                "barclaycard_bonus": {
+                    "bonus_avios": 50000,
+                    "spend_requirement_gbp": 3000,
+                }
             }
-
-        Output:
-            "Barclaycard change detected!
-
-            SPECIAL OFFER:
-            Earn 25,000 Avios
-
-            Article updated: 12 July 2026"
+        )
     """
 
     lines = [
@@ -78,6 +76,51 @@ def format_alert_message(name: str, data: dict) -> str:
 
     if data.get("update_date"):
 
+        lines.extend([
+            "",
+            f"Article updated: {data['update_date']}"
+        ])
+
+    return "\n".join(lines)
+
+def format_special_offer_alert(name: str, data: dict) -> str:
+    """
+    Format a recurring special offer notification.
+
+    Unlike change alerts, special offer notifications are generated
+    whenever an active special offer exists, regardless of whether
+    the offer has changed since the previous run.
+
+    Args:
+        name:
+            Human-readable monitor name.
+
+        data:
+            Extracted article data containing the special offer and
+            optional update date.
+
+    Returns:
+        Formatted alert message containing the offer details and
+        article update date.
+
+    Example:
+        format_special_offer_alert(
+            "HSBC Premier",
+            {
+                "special_offer": "Earn 30,000 points",
+                "update_date": "1 July 2026"
+            }
+        )
+    """
+
+    lines = [
+        f"{name} special offer detected!",
+        "",
+        "SPECIAL OFFER:",
+        data["special_offer"],
+    ]
+
+    if data.get("update_date"):
         lines.extend([
             "",
             f"Article updated: {data['update_date']}"

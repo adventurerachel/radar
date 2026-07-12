@@ -7,7 +7,7 @@ This module coordinates the end-to-end radar process:
     2. Extract monitored information from the article
     3. Record the observation in history
     4. Compare against the previous snapshot
-    5. Send an alert if a change is detected
+    5. Send an alert if a change is detected or otherwise specified
 
 Individual responsibilities are delegated to separate modules:
 
@@ -22,6 +22,11 @@ Individual responsibilities are delegated to separate modules:
 
     alerts:
         Format and send notifications
+
+    Each monitor is processed independently. The latest extracted
+    data is always stored in history. Notifications are sent when
+    extracted data differs from the previous snapshot, or when an
+    active special offer is detected.
 """
 
 import logging
@@ -32,8 +37,10 @@ from trackers.history import append_history
 from trackers.change_detector import has_changed
 from alerts.pushover import send_alert
 from monitors.page_monitor import monitor_article
-from alerts.formatter import format_alert_message
-
+from alerts.formatter import (
+    format_alert_message,
+    format_special_offer_alert,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -73,14 +80,16 @@ def main() -> None:
                 result
             )
 
-            if changed:
+            special_offer_active = result.get("special_offer") is not None
+
+            if changed or special_offer_active:
 
                 logger.info(
-                    "%s: change detected",
+                    "%s: special offer detected",
                     monitor["name"]
                 )
 
-                message = format_alert_message(
+                message = format_special_offer_alert(
                     monitor["name"],
                     result
                 )

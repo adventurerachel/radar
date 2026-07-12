@@ -1,18 +1,11 @@
 """
-Tests for radar alert message formatting.
+Tests for radar notification formatting.
 
-These tests verify that extracted monitor data is converted into
-clear notification messages suitable for sending through Pushover.
+These tests verify that:
 
-The tests focus on message content rather than exact formatting,
-allowing minor presentation changes without making the tests brittle.
-
-Covered behaviours:
-    - Formatting Barclaycard bonus information
-    - Including special offer details
-    - Including article update dates
-    - Including HSBC conclusion text
-    - Generating valid messages when optional data is missing
+    - change alerts include relevant extracted data
+    - special offer alerts include promotion details
+    - update dates are included when available
 """
 
 from alerts.formatter import format_alert_message
@@ -87,3 +80,18 @@ format_alert_message(
     "Test",
     {}
 )
+
+def test_formats_special_offer_alert():
+
+    message = format_special_offer_alert(
+        "HSBC",
+        {
+            "special_offer": "SPECIAL OFFER: Earn 30,000 points",
+            "update_date": "1 July 2026"
+        }
+    )
+
+    assert "HSBC special offer detected!" in message
+    assert "SPECIAL OFFER:" in message
+    assert "Earn 30,000 points" in message
+    assert "Article updated: 1 July 2026" in message
