@@ -68,3 +68,8 @@
 {"timestamp": "2026-07-22T09:25:27.154850+00:00", "retailer": "sainsburys", "price": 10.0, "regular_price": 13.0, "product_url": "https://example.com", "promotion_text": "Save \u00a33"}
 {"timestamp": "2026-07-22T09:25:27.155003+00:00", "retailer": "asda", "price": 10.0, "regular_price": 13.0, "product_url": "https://example.com", "promotion_text": "Save \u00a33"}
 {"timestamp": "2026-07-22T09:25:27.155154+00:00", "retailer": "pets_at_home", "price": 10.0, "regular_price": 13.0, "product_url": "https://example.com", "promotion_text": "Save \u00a33"}
+{"timestamp": "2026-07-23T09:23:51.384497+00:00", "retailer": "waitrose", "price": 10.0, "regular_price": 13.0, "product_url": "https://example.com", "promotion_text": "Save \u00a33"}
+{"timestamp": "2026-07-23T09:23:51.389234+00:00", "retailer": "tesco", "price": 10.0, "regular_price": 13.0, "product_url": "https://example.com", "promotion_text": "Save \u00a33"}
+{"timestamp": "2026-07-23T09:23:51.389397+00:00", "retailer": "sainsburys", "price": 10.0, "regular_price": 13.0, "product_url": "https://example.com", "promotion_text": "Save \u00a33"}
+{"timestamp": "2026-07-23T09:23:51.389552+00:00", "retailer": "asda", "price": 10.0, "regular_price": 13.0, "product_url": "https://example.com", "promotion_text": "Save \u00a33"}
+{"timestamp": "2026-07-23T09:23:51.389687+00:00", "retailer": "pets_at_home", "price": 10.0, "regular_price": 13.0, "product_url": "https://example.com", "promotion_text": "Save \u00a33"}
