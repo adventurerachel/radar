@@ -1,8 +1,5 @@
 # Scrumbles Price Monitor
 
-env:
-  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-
 name: Run scrumbles
 
 on:
@@ -24,7 +21,9 @@ across:
 - Asda
 - Pets at Home
 
-
+env:
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  
 ## How it works
 
 The monitor:
