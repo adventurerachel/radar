@@ -49,7 +49,7 @@ PRODUCT_ID = "scrumbles_turkey_2kg"
 DATASET = "dog_food_prices"
 
 OUTPUT_FILE = Path(
-    "storage/dog_food_prices.jsonl"
+    "storage/history/dog_food_prices.jsonl"
 )
 
 

@@ -27,4 +27,22 @@ The monitor:
 
 ## Data storage
 
-Results are stored in:
+Results are stored in: storage/history/dog_food_prices.jsonl
+
+### Scrumbles price monitor
+
+Runs daily and stores historical price observations.
+
+Output:
+
+storage/history/dog_food_prices.jsonl
+
+Each row contains:
+- retailer
+- regular price
+- promotional price
+- effective price
+- loyalty pricing
+- availability
+- source quality
+- timestamp
