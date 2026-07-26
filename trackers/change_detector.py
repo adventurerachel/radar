@@ -16,6 +16,7 @@ The snapshot file acts as persistent memory between radar runs:
 
 import json
 from pathlib import Path
+from datetime import datetime, UTC
 
 
 SNAPSHOT_FILE = Path("storage/snapshots.json")
@@ -79,21 +80,69 @@ def has_changed(monitor_id: str, current: dict) -> bool:
     snapshots = load_snapshots()
 
     previous = snapshots.get(monitor_id)
+def has_changed(
+    monitor_id: str,
+    current: dict,
+) -> bool:
+    """
+    Determine whether monitored data has changed since the last run.
+    """
+
+    snapshots = load_snapshots()
+
+    previous = snapshots.get(
+        monitor_id
+    )
+
+    current_snapshot = {
+        **current,
+        "last_checked": datetime.now(
+            UTC
+        ).isoformat(),
+    }
 
     # First ever run
     if previous is None:
 
-        snapshots[monitor_id] = current
-        save_snapshots(snapshots)
+        snapshots[monitor_id] = (
+            current_snapshot
+        )
+
+        save_snapshots(
+            snapshots
+        )
 
         return True
 
-    # No change detected
-    if previous == current:
+    # Compare without metadata
+    previous_comparable = {
+        k: v
+        for k, v in previous.items()
+        if k != "last_checked"
+    }
+
+    if previous_comparable == current:
+
+        # Update timestamp even when
+        # monitored data is unchanged
+        snapshots[monitor_id] = (
+            current_snapshot
+        )
+
+        save_snapshots(
+            snapshots
+        )
+
         return False
 
     # Change detected
-    snapshots[monitor_id] = current
-    save_snapshots(snapshots)
+    snapshots[monitor_id] = (
+        current_snapshot
+    )
+
+    save_snapshots(
+        snapshots
+    )
 
     return True
+   
