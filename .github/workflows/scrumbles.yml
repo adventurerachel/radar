@@ -3,53 +3,13 @@
 name: Run scrumbles
 
 on:
-  # Run every day at 05:00 UTC.
   schedule:
     - cron: "0 5 * * *"
+  workflow_dispatch:
 
-## Purpose
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
 
-Daily monitoring of:
-
-**Scrumbles Turkey Adult & Senior Dry Dog Food 2kg**
-
-across:
-
-- Waitrose
-- Tesco
-- Sainsbury's
-- Asda
-- Pets at Home
-
-env:
-  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  
-## How it works
-
-The monitor:
-
-1. Uses OpenAI web search to locate current retailer pricing.
-2. Extracts prices into a standard JSON structure.
-3. Appends results to JSONL storage.
-4. Prevents duplicate entries if a workflow is rerun.
-
-
-## Data storage
-
-Results are stored in: storage/dog_food_prices.jsonl
-
-
-Example:
-
-```json
-{
-  "timestamp": "2026-07-20T07:00:00+00:00",
-  "date": "2026-07-20",
-  "dataset": "dog_food_prices",
-  "product": "scrumbles_turkey_2kg",
-  "retailer": "asda",
-  "price": 10.0,
-  "currency": "GBP",
-  "found": true,
-  "source_url": "https://..."
-}
+    steps:
+      - uses: actions/checkout@v4
