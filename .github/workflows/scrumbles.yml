@@ -7,6 +7,9 @@ on:
     - cron: "0 5 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 env:
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
@@ -30,3 +33,11 @@ jobs:
 
       - name: Run Scrumbles monitor
         run: python scrumbles/monitor.py
+
+      - name: Commit price history
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add storage/history/dog_food_prices.jsonl
+          git commit -m "Update Scrumbles price history" || exit 0
+          git push
