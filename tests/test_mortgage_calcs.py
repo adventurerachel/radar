@@ -58,3 +58,22 @@ def test_interest_paid_is_less_than_total_payments():
     five_year_payments = payment * 60
 
     assert interest < five_year_payments
+
+def test_collect_test_rate_structure():
+    from mortgages.monitor import collect_test_rate
+
+    observation = collect_test_rate(
+        "65_ltv",
+        {
+            "term_years": 5,
+            "ltv": 65,
+            "balance": 338000,
+            "remaining_term_years": 20,
+        },
+    )
+
+    assert observation["provider"] == "Example Bank"
+    assert observation["rate"] == 4.00
+    assert "monthly_payment" in observation
+    assert "interest_cost_5yr" in observation
+    assert "total_cost_5yr" in observation
