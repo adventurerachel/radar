@@ -34,8 +34,8 @@ from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
-from openai import OpenAI
-
+from openai import OpenAI, OpenAIError
+from alerts.pushover import send_pushover
 
 # Load environment variables from project root
 load_dotenv(
@@ -84,7 +84,6 @@ EXPECTED_PRICE_SOURCES = {
 today = datetime.now(
     UTC
 ).date().isoformat()
-
 
 PROMPT = f"""
 Today's date is {today}.
@@ -258,7 +257,6 @@ def existing_records() -> set[tuple[str, str, str]]:
 
     return keys
 
-
 def save_prices(
     prices: list[dict[str, Any]]
 ) -> int:
@@ -406,6 +404,42 @@ def save_prices(
 
     return written
 
+def count_found_prices(
+    prices: list[dict[str, Any]]
+) -> int:
+    """
+    Count how many expected retailers returned a price.
+
+    Used to distinguish:
+        - data collection failure
+        - duplicate/no-op save
+    """
+
+    return sum(
+        1
+        for price in prices
+        if (
+            price.get("retailer") in EXPECTED_RETAILERS
+            and price.get("found") is True
+        )
+    )
+
+def missing_retailers(
+    prices: list[dict[str, Any]]
+) -> list[str]:
+    """
+    Return expected retailers missing a valid price.
+    """
+
+    found = {
+        price.get("retailer")
+        for price in prices
+        if price.get("found") is True
+    }
+
+    return sorted(
+        EXPECTED_RETAILERS - found
+    )
 
 def main() -> None:
     """
@@ -418,15 +452,35 @@ def main() -> None:
 
     prices = fetch_prices()
 
+    found = count_found_prices(
+        prices
+    )
+
     saved = save_prices(
         prices
     )
+
+    if found != len(EXPECTED_RETAILERS):
+
+        missing = missing_retailers(
+            prices
+        )
+
+        send_pushover(
+            "Scrumbles monitor warning",
+            (
+                "Missing retailer prices:\n"
+                + "\n".join(missing)
+            ),
+        )
 
     end_time = datetime.now(
         UTC
     )
 
-    runtime = end_time - start_time
+    runtime = (
+        end_time - start_time
+    )
 
     seconds = runtime.total_seconds()
 
@@ -437,6 +491,7 @@ def main() -> None:
     else:
         minutes = int(seconds // 60)
         remaining = int(seconds % 60)
+
         runtime_display = (
             f"{minutes}m {remaining}s"
         )
@@ -449,6 +504,28 @@ def main() -> None:
         f"Runtime: {runtime_display}"
     )
 
-
 if __name__ == "__main__":
-    main()
+
+    try:
+        main()
+
+    except OpenAIError as exc:
+
+        send_pushover(
+            "Scrumbles OpenAI failure",
+            f"OpenAI error:\n{exc}",
+        )
+
+        raise
+
+    except Exception as exc:
+
+        send_pushover(
+            "Scrumbles monitor failed",
+            (
+                "The daily Scrumbles price monitor failed.\n\n"
+                f"Error:\n{type(exc).__name__}: {exc}"
+            ),
+        )
+
+        raise
