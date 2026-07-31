@@ -20,17 +20,20 @@ Raises:
         If required Pushover credentials are not configured.
 """
 
-import os
 import logging
-import requests
+import os
+from pathlib import Path
 
+import requests
 from dotenv import load_dotenv
 
+load_dotenv(
+    Path(__file__).resolve().parents[1] / ".env"
+)
 
-load_dotenv()
-
-PUSHOVER_USER_KEY = os.environ.get("PUSHOVER_USER_KEY")
-PUSHOVER_API_TOKEN = os.environ.get("PUSHOVER_API_TOKEN")
+PUSHOVER_USER_KEY = os.environ["PUSHOVER_USER_KEY"]
+PUSHOVER_API_TOKEN = os.environ["PUSHOVER_API_TOKEN"]
+PUSHOVER_URL="https://api.pushover.net/1/messages.json"
 
 if not PUSHOVER_USER_KEY or not PUSHOVER_API_TOKEN:
     raise RuntimeError(
@@ -41,7 +44,11 @@ if not PUSHOVER_USER_KEY or not PUSHOVER_API_TOKEN:
 logger = logging.getLogger(__name__)
 
 
-def send_alert(title: str, message: str) -> None:
+def send_pushover(
+    title: str,
+    message: str,
+    priority: int = 0,
+) -> None:
     """
     Send a notification through Pushover.
 
@@ -60,7 +67,7 @@ def send_alert(title: str, message: str) -> None:
         Pushover credentials are validated when this module is imported.
 
     Example:
-        send_alert(
+        send_pushover(
             "Barclaycard update",
             "Bonus increased to 50,000 Avios"
         )
@@ -69,12 +76,13 @@ def send_alert(title: str, message: str) -> None:
     logger.info("Sending Pushover alert: %s", title)
 
     response = requests.post(
-        "https://api.pushover.net/1/messages.json",
+        PUSHOVER_URL,
         data={
             "token": PUSHOVER_API_TOKEN,
             "user": PUSHOVER_USER_KEY,
             "title": title,
             "message": message,
+            "priority": priority,
         },
         timeout=30
     )
@@ -86,3 +94,16 @@ def send_alert(title: str, message: str) -> None:
     )
 
     response.raise_for_status()
+
+def send_alert(
+    title: str,
+    message: str,
+) -> None:
+    """
+    Backwards-compatible wrapper.
+    """
+
+    send_pushover(
+        title,
+        message,
+    )
