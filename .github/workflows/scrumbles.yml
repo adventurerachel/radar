@@ -34,7 +34,7 @@ jobs:
           pip install openai python-dotenv
 
       - name: Run Scrumbles monitor
-        run: python scrumbles/monitor.py
+        run: python -m scrumbles/monitor
 
       - name: Commit price history
         run: |
