@@ -349,7 +349,7 @@ competitiveness["Lowest price"] = (
 
 
 # Display chart and table side by side
-col_chart, col_table = st.columns(2)
+col_chart, col_table = st.columns([35, 65])
 
 with col_chart:
     st.subheader("Days Cheapest")
@@ -371,6 +371,7 @@ with col_chart:
         xaxis_title="Days cheapest",
         yaxis_title="",
         showlegend=False,
+        height=300,
     )
 
     st.plotly_chart(
