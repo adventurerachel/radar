@@ -10,7 +10,9 @@ dependencies = [
     "playwright>=1.62.0",
     "python-dotenv>=1.2.2",
     "requests>=2.34.2",
-    "openai>=3.0.0"
+    "openai>=3.0.0",
+    "streamlit>=1.0.0",
+    "plotly>=6.0.0"
 ]
 
 [dependency-groups]

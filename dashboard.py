@@ -4,6 +4,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+import plotly.express as px
 
 DATA_FILE = Path("storage/history/dog_food_prices.jsonl")
 
@@ -264,13 +265,6 @@ st.dataframe(
     hide_index=True,
 )
 
-st.header("Underlying Data")
-
-st.dataframe(
-    df,
-    use_container_width=True,
-)
-
 st.header("Price Competitiveness")
 
 st.caption("How often each retailer offered the lowest price")
@@ -302,14 +296,12 @@ competitive_daily = competitive_daily.merge(
     on="date",
 )
 
-
 # A retailer is cheapest if its price equals
 # the lowest price available that day
 competitive_daily["is_cheapest"] = (
     competitive_daily["effective_price"]
     == competitive_daily["daily_min_price"]
 )
-
 
 # Summarise competitiveness by retailer
 competitiveness = (
@@ -324,13 +316,11 @@ competitiveness = (
     .reset_index()
 )
 
-
 competitiveness["win_rate"] = (
     competitiveness["days_cheapest"]
     / competitiveness["days_competing"]
     * 100
 )
-
 
 # Rename columns for display
 competitiveness = competitiveness.rename(
@@ -343,7 +333,6 @@ competitiveness = competitiveness.rename(
         "lowest_price": "Lowest price",
     }
 )
-
 
 # Format values
 competitiveness["Win rate %"] = (
@@ -365,6 +354,29 @@ competitiveness = competitiveness.sort_values(
     ascending=False,
 )
 
+chart_data = competitiveness.sort_values(
+    "Days cheapest",
+    ascending=True,
+)
+
+fig = px.bar(
+    chart_data,
+    x="Days cheapest",
+    y="Retailer",
+    orientation="h",
+    text="Days cheapest",
+)
+
+fig.update_layout(
+    xaxis_title="Days cheapest",
+    yaxis_title="",
+    showlegend=False,
+)
+
+st.plotly_chart(
+    fig,
+    use_container_width=True,
+)
 
 st.dataframe(
     competitiveness,
@@ -433,4 +445,11 @@ st.dataframe(
     health_summary,
     use_container_width=True,
     hide_index=True,
+)
+
+st.header("Underlying Data")
+
+st.dataframe(
+    df,
+    use_container_width=True,
 )
