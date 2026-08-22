@@ -271,6 +271,113 @@ st.dataframe(
     use_container_width=True,
 )
 
+st.header("Price Competitiveness")
+
+st.caption("How often each retailer offered the lowest price")
+
+
+# One price per retailer per day
+competitive_daily = (
+    filtered_df[
+        (filtered_df["found"] == True)
+        & (filtered_df["effective_price"].notna())
+    ]
+    .groupby(["date", "retailer"])["effective_price"]
+    .last()
+    .reset_index()
+)
+
+
+# Find the lowest available price on each day
+daily_min = (
+    competitive_daily
+    .groupby("date")["effective_price"]
+    .min()
+    .rename("daily_min_price")
+    .reset_index()
+)
+
+competitive_daily = competitive_daily.merge(
+    daily_min,
+    on="date",
+)
+
+
+# A retailer is cheapest if its price equals
+# the lowest price available that day
+competitive_daily["is_cheapest"] = (
+    competitive_daily["effective_price"]
+    == competitive_daily["daily_min_price"]
+)
+
+
+# Summarise competitiveness by retailer
+competitiveness = (
+    competitive_daily
+    .groupby("retailer")
+    .agg(
+        days_competing=("date", "count"),
+        days_cheapest=("is_cheapest", "sum"),
+        average_price=("effective_price", "mean"),
+        lowest_price=("effective_price", "min"),
+    )
+    .reset_index()
+)
+
+
+competitiveness["win_rate"] = (
+    competitiveness["days_cheapest"]
+    / competitiveness["days_competing"]
+    * 100
+)
+
+
+# Rename columns for display
+competitiveness = competitiveness.rename(
+    columns={
+        "retailer": "Retailer",
+        "days_competing": "Days competing",
+        "days_cheapest": "Days cheapest",
+        "win_rate": "Win rate %",
+        "average_price": "Avg price",
+        "lowest_price": "Lowest price",
+    }
+)
+
+
+# Format values
+competitiveness["Win rate %"] = (
+    competitiveness["Win rate %"].round(1)
+)
+
+competitiveness["Avg price"] = (
+    competitiveness["Avg price"].round(2)
+)
+
+competitiveness["Lowest price"] = (
+    competitiveness["Lowest price"].round(2)
+)
+
+
+# Show strongest competitors first
+competitiveness = competitiveness.sort_values(
+    "Win rate %",
+    ascending=False,
+)
+
+
+st.dataframe(
+    competitiveness,
+    use_container_width=True,
+    hide_index=True,
+)
+
+st.dataframe(
+    competitiveness,
+    use_container_width=True,
+    hide_index=True,
+)
+
 st.header("Monitor Health")
 
 # Total monitoring period
