@@ -348,41 +348,44 @@ competitiveness["Lowest price"] = (
 )
 
 
-# Show strongest competitors first
-competitiveness = competitiveness.sort_values(
-    "Win rate %",
-    ascending=False,
-)
+# Display chart and table side by side
+col_chart, col_table = st.columns(2)
 
-chart_data = competitiveness.sort_values(
-    "Days cheapest",
-    ascending=True,
-)
+with col_chart:
+    st.subheader("Days Cheapest")
 
-fig = px.bar(
-    chart_data,
-    x="Days cheapest",
-    y="Retailer",
-    orientation="h",
-    text="Days cheapest",
-)
+    chart_data = competitiveness.sort_values(
+        "Days cheapest",
+        ascending=True,
+    )
 
-fig.update_layout(
-    xaxis_title="Days cheapest",
-    yaxis_title="",
-    showlegend=False,
-)
+    fig = px.bar(
+        chart_data,
+        x="Days cheapest",
+        y="Retailer",
+        orientation="h",
+        text="Days cheapest",
+    )
 
-st.plotly_chart(
-    fig,
-    use_container_width=True,
-)
+    fig.update_layout(
+        xaxis_title="Days cheapest",
+        yaxis_title="",
+        showlegend=False,
+    )
 
-st.dataframe(
-    competitiveness,
-    use_container_width=True,
-    hide_index=True,
-)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+    )
+
+with col_table:
+    st.subheader("Competitiveness")
+
+    st.dataframe(
+        competitiveness,
+        use_container_width=True,
+        hide_index=True,
+    )
 
 st.header("Monitor Health")
 
