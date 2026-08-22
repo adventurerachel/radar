@@ -384,12 +384,6 @@ st.dataframe(
     hide_index=True,
 )
 
-st.dataframe(
-    competitiveness,
-    use_container_width=True,
-    hide_index=True,
-)
-
 st.header("Monitor Health")
 
 # Total monitoring period
