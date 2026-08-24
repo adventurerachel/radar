@@ -33,6 +33,7 @@ def load_data():
 df = load_data()
 
 df["date"] = pd.to_datetime(df["date"])
+last_update = pd.to_datetime(df["timestamp"]).max()
 
 col_title, col_filter = st.columns([3, 1])
 
@@ -64,6 +65,9 @@ filtered_df = df[
 ].copy()
 
 st.write(f"Loaded **{len(df)} observations**.")
+st.caption(
+    f"Last update: {last_update.strftime('%d %B %Y at %H:%M UTC')}"
+)
 
 
 # Make sure dates are treated as dates
