@@ -24,6 +24,23 @@ Schema captures:
     - effective customer price
     - promotion details
     - source information
+
+- For Sainsbury's, prefer the exact product page:
+    https://www.sainsburys.co.uk/gol-ui/product/scrumbles-turkey-gut-friendly-dog-food-2kg
+
+- The Sainsbury's product page may require JavaScript to render
+  price information. If the exact product page cannot be directly
+  read, use a Sainsbury's category/search result or retailer snippet
+  only if it clearly identifies this exact 2kg Turkey product.
+
+- Do not substitute Scrumbles Chicken, other Scrumbles Turkey products,
+  wet food, treats, or other pack sizes.
+
+- `date` is the date of the Radar observation.
+- `timestamp` is the exact date/time of the Radar observation.
+- `source_date` is the date associated with the source information,
+  when the source provides one. Do not replace it with the Radar
+  observation date.
 """
 
 from __future__ import annotations
